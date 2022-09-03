@@ -1,18 +1,17 @@
 const express = require('express')
 const { port } = require('./config')
-const connection = require('./config/db')
+const { connection } = require('./config/db')
+const auth = require('./routes/auth')
 
 const app = express()
-
-// Database
-connection()
 
 // Middlewares
 app.use(express.json())
 
-app.use(express.urlencoded({
-  extended: true
-}))
+// Database
+connection()
+
+auth(app)
 
 // Rutas
 app.use(require('./routes'))
