@@ -30,6 +30,13 @@ class Users {
       return error
     }
   }
+
+  async addActivityId (activityId, userId) {
+    const user = await User.findById(userId)
+
+    user.activitysId.push(activityId)
+    user.save()
+  }
 }
 
 module.exports = Users

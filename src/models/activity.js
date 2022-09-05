@@ -7,8 +7,8 @@ const activitySchema = new mongoose.Schema({
   dateEnd: Date,
   color: String,
   icon: String,
-  idUser: String
-
+  idUser: String,
+  usersGroup: Array
 })
 
 const Activity = mongoose.model('Activity', activitySchema)

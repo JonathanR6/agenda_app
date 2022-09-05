@@ -1,9 +1,21 @@
 const Activity = require('../models/activity')
+const Users = require('./users')
 
 class Activities {
   async new (data) {
     try {
+      const users = new Users()
+      if (data.usersGroup) {
+        const userArray = await data.usersGroup.map(mail => users.getOneByEmail(mail))
+        const group = await Promise.all(userArray)
+
+        data.usersGroup = group.map(user => user.data._id)
+      }
+
       const activity = await Activity.create(data)
+      users.addActivityId(activity._id, activity.idUser)
+      activity.usersGroup?.map(userId => users.addActivityId(activity._id, userId))
+
       return {
         data: activity,
         success: true,
