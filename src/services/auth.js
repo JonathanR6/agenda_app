@@ -48,8 +48,7 @@ class Auth {
       success,
       message
     } = await this.#users.create(data)
-    // eslint-disable-next-line no-console
-    console.log(user)
+
     if (!success) {
       return {
         message,
