@@ -8,4 +8,6 @@ routes.get('/', (req, res) => {
 
 routes.use('/api/auth', require('./auth'))
 
+routes.use('/api/activities', require('./activity'))
+
 module.exports = routes
