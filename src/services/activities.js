@@ -1,4 +1,4 @@
-const { Activity } = require('../models/index')
+const Activity = require('../models/activity')
 
 class Activities {
   async new (data) {
