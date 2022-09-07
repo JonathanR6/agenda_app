@@ -7,7 +7,7 @@ const activitySchema = new mongoose.Schema({
   dateEnd: Date,
   color: String,
   icon: String,
-  idUser: String,
+  adminUsers: Array,
   usersGroup: Array
 })
 

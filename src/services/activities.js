@@ -1,20 +1,15 @@
 const Activity = require('../models/activity')
-const Users = require('./users')
 
 class Activities {
   async new (data) {
     try {
-      const users = new Users()
-      if (data.usersGroup) {
-        const userArray = await data.usersGroup.map(mail => users.getOneByEmail(mail))
-        const group = await Promise.all(userArray)
+      const email = data.user.email
 
-        data.usersGroup = group.map(user => user.data._id)
-      }
-
-      const activity = await Activity.create(data)
-      users.addActivityId(activity._id, activity.idUser)
-      activity.usersGroup?.map(userId => users.addActivityId(activity._id, userId))
+      const activity = await Activity.create({
+        ...data,
+        usersGroup: [email, ...data.usersGroup],
+        adminUsers: [email]
+      })
 
       return {
         data: activity,
@@ -23,17 +18,16 @@ class Activities {
       }
     } catch (error) {
       return {
-        error,
         success: false,
-        message: 'Error ocurred'
+        message: error.message
       }
     }
   }
 
-  async list () {
+  async list (user) {
     try {
-      const activity = await Activity.find()
-      console.log(activity)
+      const activity = await Activity.find({ usersGroup: { $in: user.email } })
+
       return {
         data: activity,
         success: true
@@ -49,6 +43,7 @@ class Activities {
   async getId (id) {
     try {
       const activity = await Activity.findById(id)
+
       return {
         success: true,
         data: activity
@@ -63,8 +58,8 @@ class Activities {
 
   async edit (id, data) {
     try {
-      const options = { new: true }
-      const activity = await Activity.findByIdAndUpdate(id, data, options)
+      const activity = await Activity.findOneAndUpdate({ adminUsers: { $in: data.user.email } }, data, { new: true })
+
       return {
         success: true,
         message: 'update activity successfully',
@@ -72,15 +67,19 @@ class Activities {
       }
     } catch (error) {
       return {
+
         success: false,
-        message: 'Error ocurred'
+        message: error.message
       }
     }
   }
 
-  async delete (id) {
+  async delete (id, user) {
     try {
-      const activity = await Activity.findByIdAndDelete(id)
+      const activity = await Activity.findOneAndDelete({ adminUsers: { $in: user.email } })
+
+      if (activity === null) throw new Error('you dont have permissions')
+
       return {
         success: true,
         message: 'delete activity successfully',
