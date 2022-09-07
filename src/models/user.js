@@ -3,8 +3,7 @@ const { mongoose } = require('../config/db')
 const userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
-  password: String,
-  activitysId: Array
+  password: String
   // registerDate: Date.now()
 })
 
