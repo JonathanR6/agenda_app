@@ -10,30 +10,20 @@ class Auth {
   }
 
   async login (data) {
-    const { email, password } = data
-    if (!email || !password) {
+    try {
+      const { email, password } = data
+      if (!email || !password) throw new Error('Incorrect credentials')
+
+      const { success, data: user } = await this.#users.getOneByEmail(email)
+
+      if (!success || !(await this.#compare(password, user.password))) throw new Error('Incorrect credentials')
+
+      return this.#generateAuthData(user)
+    } catch (error) {
       return {
         success: false,
-        message: 'Incorrect credentials'
+        message: error.message
       }
-    }
-
-    const { success, data: user, message } = await this.#users.getOneByEmail(email)
-    if (success && (await this.#compare(password, user.password))) {
-      delete user.password
-      // eslint-disable-next-line no-console
-      // console.log(user)
-      return {
-        success: true,
-        data: user,
-        ...this.#generateAuthData,
-        message
-      }
-    }
-
-    return {
-      success: false,
-      message: 'Incorrect credentials'
     }
   }
 
@@ -69,9 +59,9 @@ class Auth {
     }
   }
 
-  #compare (string, hash) {
+  async #compare (string, hash) {
     try {
-      return bcrypt.compare(string, hash)
+      return await bcrypt.compare(string, hash)
     } catch (error) {
       return false
     }
@@ -83,12 +73,25 @@ class Auth {
     })
   }
 
+  getToken (token) {
+    return jwt.verify(token, jwtSecret, (err, decoded) => {
+      if (err) throw new Error('Credenciales no validas')
+
+      return {
+        success: true,
+        data: decoded
+      }
+    })
+  }
+
   #generateAuthData (userData) {
-    const user = { email: userData.email, name: userData.name }
+    const user = { email: userData.email, name: userData.name, id: userData._id }
     return {
-      data: user,
       success: true,
-      token: this.#createToken(user)
+      data: {
+        ...user,
+        token: this.#createToken(user)
+      }
     }
   }
 }
