@@ -6,6 +6,7 @@ class Users {
       const user = await User.findOne({
         email
       })
+      if (user === null) throw new Error('Username does not exist')
 
       return {
         success: !!user,
@@ -22,6 +23,7 @@ class Users {
   async create (data) {
     try {
       const user = await User.create(data)
+
       return {
         data: user,
         success: true
@@ -29,13 +31,6 @@ class Users {
     } catch (error) {
       return error
     }
-  }
-
-  async addActivityId (activityId, userId) {
-    const user = await User.findById(userId)
-
-    user.activitysId.push(activityId)
-    user.save()
   }
 }
 
