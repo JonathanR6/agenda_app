@@ -1,5 +1,7 @@
 const { Router } = require('express')
 const AuthService = require('../services/auth')
+const validationHandler = require('../middlewares/validationHandler')
+const createUserSchema = require('../schemas/user')
 
 const authRoute = Router()
 
@@ -11,7 +13,7 @@ authRoute.post('/login', async (req, res) => {
   return res.status(result.success ? 200 : 400).json(result)
 })
 
-authRoute.post('/signup', async (req, res) => {
+authRoute.post('/signup', validationHandler(createUserSchema), async (req, res) => {
   const result = await authServ.signup(req.body)
   return res.status(result.success ? 200 : 400).json(result)
 })

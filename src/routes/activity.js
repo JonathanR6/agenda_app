@@ -1,12 +1,14 @@
 const { Router } = require('express')
 const ActivityService = require('../services/activities')
 const getCredentials = require('../middlewares/getCredentials')
+const createActivitySchema = require('../schemas/activity')
+const validationHandler = require('../middlewares/validationHandler')
 
 const activityRoute = Router()
 
 const actServ = new ActivityService()
 
-activityRoute.post('/add', getCredentials, async ({ body }, res) => {
+activityRoute.post('/add', getCredentials, validationHandler(createActivitySchema), async ({ body }, res) => {
   const result = await actServ.new(body)
   return res.status(result.success ? 200 : 400).json(result)
 })
