@@ -1,4 +1,4 @@
-// const Users = require('../services/users')
+const Users = require('../services/users')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { jwtSecret } = require('../config')
@@ -6,7 +6,7 @@ const { jwtSecret } = require('../config')
 class Auth {
   #users
   constructor () {
-    this.#users = () => {}
+    this.#users = new Users()
   }
 
   async login (data) {
