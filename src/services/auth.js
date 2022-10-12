@@ -1,4 +1,4 @@
-const Users = require('./users')
+const Users = require('../services/users')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { jwtSecret } = require('../config')
